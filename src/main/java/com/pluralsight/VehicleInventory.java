@@ -21,22 +21,12 @@ public class VehicleInventory {
                 6 - Quit
                 Enter your command:""";
 
-        String newVehicle = """
-                """;
-
-        Vehicle vehicle1 = new Vehicle(101121, "Ford Explorer", "Red", 45000, 13500);
-        Vehicle vehicle2 = new Vehicle(101122, "Toyota Camry", "Blue", 60000, 11000);
-        Vehicle vehicle3 = new Vehicle(101123, "Chevrolet Malibu", "Black", 50000, 9700);
-        Vehicle vehicle4 = new Vehicle(101124, "Honda Civic", "White", 70000, 7500);
-        Vehicle vehicle5 = new Vehicle(101125, "Subaru Outback", "Green", 55000, 14500);
-        Vehicle vehicle6 = new Vehicle(101126, "Jeep Wrangler", "Yellow", 30000, 16000);
-
-        inventory[0] = vehicle1;
-        inventory[1] = vehicle2;
-        inventory[2] = vehicle3;
-        inventory[3] = vehicle4;
-        inventory[4] = vehicle5;
-        inventory[5] = vehicle6;
+        inventory[0] = new Vehicle(101121, "Ford Explorer", "Red", 45000, 13500);
+        inventory[1] = new Vehicle(101122, "Toyota Camry", "Blue", 60000, 11000);
+        inventory[2] = new Vehicle(101123, "Chevrolet Malibu", "Black", 50000, 7700);
+        inventory[3] = new Vehicle(101124, "Honda Civic", "White", 70000, 7500);
+        inventory[4] = new Vehicle(101125, "Subaru Outback", "Green", 55000, 14500);
+        inventory[5] = new Vehicle(101126, "Jeep Wrangler", "Yellow", 30000, 16000);
 
 
         do {
@@ -56,13 +46,20 @@ public class VehicleInventory {
                     break;
                 case 3:
                     searchByPrice(inventory, counter, myScanner);
+                    break;
                 case 4:
                     searchByColor(inventory, counter, myScanner);
                     break;
                 case 5:
-                    Vehicle vehicle = inventory[counter];
-                    inventory[counter] = addVehicle(inventory, counter, myScanner);
-                    counter++;
+                    if (counter < inventory.length) {
+                        Vehicle vehicle = inventory[counter];
+                        inventory[counter] = addVehicle(inventory, counter, myScanner);
+                        counter++;
+                        break;
+                    } else {
+                        System.out.println("Car inventory is full!");
+                        break;
+                    }
                 default:
                     break;
             }
@@ -71,51 +68,94 @@ public class VehicleInventory {
 
     }
 
-    private static void searchByPrice(Vehicle[] inventory, int counter, Scanner myScanner) {
+    private static void listAllVehicles(Vehicle[] inventory, int counter) {
+        for (int i = 0; i < counter; i++) {
+            System.out.println(inventory[i].getMakeModel());
+        }
+    }
 
-        boolean priceFound = false;
-        double price = 0;
+    //region search by...
+    private static void searchByMakeModel(Vehicle[] inventory, int counter, Scanner myScanner) {
 
-        System.out.print("Enter price: ");
-        String colorInput = myScanner.next();
+        int carCount = 0;
+        String[] cars = new String[20];
+
+        System.out.print("Enter make: ");
+        String makeInput = myScanner.next();
+        System.out.print("Enter model: ");
+        String modelInput = myScanner.next();
+
+        String carMakeModel = makeInput + " " + modelInput;
 
         for (int i = 0; i < counter; i++) {
-            if (inventory[i].getColor().equals(colorInput)) {
-                priceFound = true;
-                price = inventory[i].getPrice();
+
+            if (inventory[i].getMakeModel().equals(carMakeModel)) {
+                String car = inventory[i].getMakeModel();
+                cars[carCount] = inventory[i].getMakeModel();
+                System.out.print(car + " Found\n");
+                System.out.println(cars[carCount]);
+                carCount++;
             }
         }
+        if (carCount == 0) {
+            System.out.println("Car Not Found");
+        }
+    }
 
-        if (priceFound) {
-            System.out.print(price + " Found");
-        } else {
-            System.out.println("Car Color Not Found.");
+    private static void searchByPrice(Vehicle[] inventory, int counter, Scanner myScanner) {
+
+        int carCount = 0;
+        String[] cars = new String[20];
+
+        System.out.print("Enter Price: $");
+        String priceInput = myScanner.next();
+        double price = Double.parseDouble(priceInput);
+        double minPrice = price - 500;
+        double maxPrice = price + 500;
+
+        System.out.printf("Cars found at $%.2f", price);
+        System.out.print(" price range ($500 price range): \n");
+
+        for (int i = 0; i < counter; i++) {
+
+            if (inventory[i].getPrice() >= minPrice && inventory[i].getPrice() <= maxPrice) {
+                cars[carCount] = inventory[i].getMakeModel();
+                System.out.println((i + 1) + " - " + cars[carCount]);
+                carCount++;
+            }
+        }
+        if (carCount == 0) {
+            System.out.println("Car Not Found");
         }
 
     }
 
     private static void searchByColor(Vehicle[] inventory, int counter, Scanner myScanner) {
 
-        boolean colorFound = false;
         String color = "";
+        int carCount = 0;
+        String[] cars = new String[20];
 
         System.out.print("Enter color: ");
         String colorInput = myScanner.next();
 
         for (int i = 0; i < counter; i++) {
+
             if (inventory[i].getColor().equals(colorInput)) {
-                colorFound = true;
                 color = inventory[i].getColor();
+                cars[carCount] = inventory[i].getMakeModel();
+                System.out.print(color + " Found\n");
+                System.out.println(cars[carCount]);
+                carCount++;
             }
         }
-
-        if (colorFound) {
-            System.out.print(color + " Found");
-        } else {
-            System.out.println("Car Color Not Found.");
+        if (carCount == 0) {
+            System.out.println("Car Not Found");
         }
 
     }
+
+    //endregion
 
     private static Vehicle addVehicle(Vehicle[] inventory, int counter, Scanner myScanner) {
 
@@ -141,39 +181,6 @@ public class VehicleInventory {
         double price = Double.parseDouble(stringPrice);
 
         return new Vehicle(vehicleID, makeModel, color, odometerReading, price);
-    }
-
-    private static void searchByMakeModel(Vehicle[] inventory, int counter, Scanner myScanner) {
-
-        boolean carFound = false;
-        String car = "";
-
-        System.out.print("Enter make: ");
-        String makeInput = myScanner.next();
-        System.out.print("Enter model: ");
-        String modelInput = myScanner.next();
-
-        String carMakeModel = makeInput + " " + modelInput;
-
-        for (int i = 0; i < counter; i++) {
-            if (inventory[i].getMakeModel().equals(carMakeModel)) {
-                carFound = true;
-                car = inventory[i].getMakeModel();
-            }
-        }
-
-        if (carFound) {
-            System.out.println(car + " Found.");
-        } else {
-            System.out.println("Car Not Found.");
-        }
-    }
-
-
-    private static void listAllVehicles(Vehicle[] inventory, int counter) {
-        for (int i = 0; i < counter; i++) {
-            System.out.println(inventory[i].getMakeModel());
-        }
     }
 
 }
